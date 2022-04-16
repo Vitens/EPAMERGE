@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EPAMERGE", "EpanetMerger\EPAMERGE.vbproj", "{7BAD0A10-4C2F-4E62-A74A-51D60477E198}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BAD0A10-4C2F-4E62-A74A-51D60477E198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BAD0A10-4C2F-4E62-A74A-51D60477E198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAD0A10-4C2F-4E62-A74A-51D60477E198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAD0A10-4C2F-4E62-A74A-51D60477E198}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B13EB35B-B8EC-4B10-A680-1ED818E85CAA}
+	EndGlobalSection
+EndGlobal
