@@ -2,8 +2,6 @@ Imports System
 Imports System.IO
 
 Module Program
-
-
     Private Const HelpString = "Merges two EPAnet file into one. Returns whether or not the merge was successful.
 
 EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file] [drive:][path][filename combined file] [/L:logtype]
@@ -12,15 +10,13 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
                Specifies drive, directory, and/or files to list.
  
   /L           Log results to 'logresults.txt' file.
-  logtype       N  No logging; default option when no parameter option is given.
+  logtype       N  No logging; default option, when no parameter option is given.
                 C  Compact logging: minimal information on exceptions.
                 F  Full logging: detailed information on exceptions, e.g. on duplicate nodes and links.
 
 "
 
     Private filenames(2) As String
-    Private combinedFile As New Dictionary(Of String, List(Of String))
-    Private logResults As String = ""
     Private epamanager As New EpanetManager
 
     Sub Main(args As String())
@@ -59,34 +55,39 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
 
     End Sub
 
-    Private Sub mergeEpanetFiles()
+    Private Sub MergeEpanetFiles()
+        Dim result As Integer
+
         'Load Epanet files 1 and 2 in memory
         For idx = 0 To 1
-            loadEpanetFile(filenames(idx))
+            result = epamanager.Load(filenames(idx))
+            If result = 1 Then
+                ShowErrorMessage("load", filenames(idx))
+                End
+            End If
         Next
 
         'Write combined file to disk
-        saveEpanetFile()
-
-        'Write logfile
-        If epamanager.LogType <> LogTypes.NoLogging Then writeLogfile()
+        result = epamanager.Save(filenames(2))
+        If result = 1 Then
+            ShowErrorMessage("save", filenames(2))
+            End
+        Else
+            ShowFinishedMessage()
+        End If
     End Sub
 
-    Private Sub loadEpanetFile(filename As String)
-        'Get contents of filename and store in combined file
-        combinedFile = epamanager.Open(filename)
+    Private Sub ShowErrorMessage(process As String, filename As String)
+        Console.WriteLine($"Error: couldn't {process} file '{filename}'.")
+        If epamanager.LogType <> LogTypes.NoLogging Then
+            Console.WriteLine("See the logfile for more details.")
+        End If
     End Sub
 
-    Private Sub saveEpanetFile()
-        'Save combined file
-
+    Private Sub ShowFinishedMessage()
+        Console.WriteLine($"Successfully created a combined Epanet file.")
+        If epamanager.LogType <> LogTypes.NoLogging And epamanager.EventsLogged Then
+            Console.WriteLine("See the logfile for events and more details.")
+        End If
     End Sub
-
-    Private Sub writeLogfile()
-        Dim logfilename = IO.Path.GetFullPath(filenames(2)) + "logresults.txt"
-
-        'Write logresults to file
-        File.AppendAllLines(logfilename, epamanager.Logbook)
-    End Sub
-
 End Module
