@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>EpanetMerger</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <Copyright>Trietsch 2022</Copyright>
+    <Description>Epanet File Merger</Description>
   </PropertyGroup>
 
 </Project>

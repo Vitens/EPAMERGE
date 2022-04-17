@@ -32,7 +32,7 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
             filenames(1) = args(1)
             filenames(2) = args(2)
 
-            If args.Count > 2 Then
+            If args.Count > 3 Then
                 Dim arg = args(3).ToUpper
                 If arg.StartsWith("/L") Then
                     arg = arg.Replace(":", "").Replace("/L", "")
@@ -80,14 +80,14 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
     Private Sub ShowErrorMessage(process As String, filename As String)
         Console.WriteLine($"Error: couldn't {process} file '{filename}'.")
         If epamanager.LogType <> LogTypes.NoLogging Then
-            Console.WriteLine("See the logfile for more details.")
+            Console.WriteLine("See the logfile 'logresults.txt' for more details.")
         End If
     End Sub
 
     Private Sub ShowFinishedMessage()
         Console.WriteLine($"Successfully created a combined Epanet file.")
         If epamanager.LogType <> LogTypes.NoLogging And epamanager.EventsLogged Then
-            Console.WriteLine("See the logfile for events and more details.")
+            Console.WriteLine("See the logfile 'logresults.txt' for events and more details.")
         End If
     End Sub
 End Module
