@@ -94,11 +94,11 @@ Public Class EpanetManager
         Dim msg As String = ""
 
         If LogType <> LogTypes.NoLogging Then
-            logbook.Add($"Logbook created: {Now.ToString("f")}")
-            logbook.Add("")
-
             If filesProcessed = 0 Then
-                msg = "Combined network from two Epanet files:"
+                logbook.Add($"Logbook created: {Now.ToString("f")}")
+                logbook.Add("")
+
+                msg = "Combining the following two Epanet files:"
                 network("Title").Add(msg)
                 logbook.Add("----------------------------------------------")
                 logbook.Add(msg)
@@ -261,7 +261,7 @@ Public Class EpanetManager
     End Sub
 
     Private Sub AddFatalError(title As String, exceptionMessage As String)
-        logbook.Add("----------------------------------------------")
+        'logbook.Add("----------------------------------------------")
         logbook.Add("*** FATAL ERROR ***")
         logbook.Add(title)
         logbook.Add(exceptionMessage)

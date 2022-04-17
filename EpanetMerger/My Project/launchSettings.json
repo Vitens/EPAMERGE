@@ -2,7 +2,7 @@
   "profiles": {
     "EPAMERGE": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\net1.inp C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\net3.inp C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\combinet.inp /L:F"
+      "commandLineArgs": "C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\net11.inp C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\net3.inp C:\\Users\\trietsche\\source\\repos\\Epanet\\Examples\\combinet.inp /L:F"
     }
   }
 }
