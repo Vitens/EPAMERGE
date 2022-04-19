@@ -16,6 +16,9 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
 
 "
 
+    Private Const ERROR_SUCCESS = 0
+    Private Const ERROR_FAILURE = 1
+
     Private filenames(2) As String
     Private epamanager As New EpanetManager
 
@@ -63,7 +66,7 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
             result = epamanager.Load(filenames(idx))
             If result = 1 Then
                 ShowErrorMessage("load", filenames(idx))
-                End
+                Environment.Exit(ERROR_FAILURE)
             End If
         Next
 
@@ -71,9 +74,10 @@ EPAMERGE [drive:][path][filename first file] [drive:][path][filename second file
         result = epamanager.Save(filenames(2))
         If result = 1 Then
             ShowErrorMessage("save", filenames(2))
-            End
+            Environment.Exit(ERROR_FAILURE)
         Else
             ShowFinishedMessage()
+            Environment.Exit(ERROR_SUCCESS)
         End If
     End Sub
 
