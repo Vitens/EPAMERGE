@@ -16,6 +16,7 @@ Public Class EpanetManager
     Private logbook As List(Of String)
 
     Public Property LogType As LogTypes = LogTypes.NoLogging
+    Public Property LogFilename As String
     Public ReadOnly Property EventsLogged As Boolean
 
     Public Sub New()
@@ -29,7 +30,7 @@ Public Class EpanetManager
 
     Public Function Load(ByVal filename As String) As Integer
         Try
-            If Not IsEpanetFile(filename) Then End
+            If Not IsEpanetFile(filename) Then Return ERROR_FAILURE
 
             SetLogbookHeader(filename)
 
@@ -37,19 +38,19 @@ Public Class EpanetManager
             ProcessFile(filename)
 
             filesProcessed += 1
-            Return 0
+            Return ERROR_SUCCESS
+
+        Catch ex As FileNotFoundException
+            ProcessError($"Couldn't find the specified file '{filename}'!", ex)
+            Return ERROR_FILE_NOT_FOUND
 
         Catch ex As Exception
-            AddFatalError($"Processing file '{filename}' failed!", ex.Message)
-            SaveLogbook(filename)
-
-            Return 1
+            ProcessError($"Processing file '{filename}' failed!", ex)
+            Return ERROR_FAILURE
         End Try
     End Function
 
     Public Function Save(ByVal filename As String) As Integer
-        Dim savingLogbook As Boolean = False
-
         Try
             'Delete old file, if it exists
             File.Delete(filename)
@@ -59,71 +60,81 @@ Public Class EpanetManager
                 File.AppendAllLines(filename, network(s))
             Next
 
-            savingLogbook = True
-            SaveLogbook(filename)
+            'Save logbook
+            If LogType <> LogTypes.NoLogging Then SaveLogbook()
 
-            Return 0
+            Return ERROR_SUCCESS
+
+        Catch ex As DirectoryNotFoundException
+            ProcessError($"Path of the specified file '{filename}' could not be found!", ex)
+            Return ERROR_PATH_NOT_FOUND
+
+        Catch ex As PathTooLongException
+            ProcessError($"Path of the specified file '{filename}' is to long!", ex)
+            Return ERROR_BAD_PATHNAME
+
+        Catch ex As AccessViolationException
+            ProcessError($"Couldn't access the path or file specified: '{filename}'!", ex)
+            Return ERROR_ACCESS_DENIED
 
         Catch ex As Exception
-            Console.WriteLine("*** FATAL ERROR ***")
-            If Path.GetExtension(filename).ToLower = ".inp" Then
-                Console.WriteLine($"*** Saving the combined Epanet file '{filename}' failed!  {ex.Message} ***")
-            Else
-                Console.WriteLine($"*** Saving the logbook '{filename}' failed!  {ex.Message} ***")
-            End If
+            ProcessError($"Saving file '{filename}' failed!", ex)
+            Return ERROR_FAILURE
 
-            If Not savingLogbook Then
-                AddFatalError($"Saving the combined Epanet file '{filename}' failed!", ex.Message)
-                SaveLogbook(filename)
-            End If
-
-            Return 1
         End Try
     End Function
 
-    Private Function IsEpanetFile(filename As String) As Boolean
-        If Path.GetExtension(filename).ToLower <> ".inp" Then
-            Console.WriteLine($"Invalid filetype: {Path.GetFileName(filename)}. EPAMERGE can only process .INP files.")
-            Return False
-        Else
-            Return True
-        End If
-    End Function
+    Private Sub ProcessError(title As String, ex As Exception)
+        WriteErrorMessageToConsole(title, ex)
+        WriteErrorMessageToLogbook(title, ex)
+    End Sub
+
+    Private Sub WriteErrorMessageToConsole(title As String, ex As Exception)
+        Console.WriteLine($"*** {title}  {ex.Message} ***")
+    End Sub
+
+    Private Sub WriteErrorMessageToLogbook(filename As String, ex As Exception)
+        AddToLogbook($"Saving the target file '{filename}' failed!", ex.Message)
+        'Save logbook
+        If LogType <> LogTypes.NoLogging Then SaveLogbook()
+    End Sub
 
     Private Sub SetLogbookHeader(filename)
         Dim msg As String = ""
 
-        If LogType <> LogTypes.NoLogging Then
-            If filesProcessed = 0 Then
-                logbook.Add($"Logbook created: {Now.ToString("f")}")
-                logbook.Add("")
+        If filesProcessed = 0 Then
+            logbook.Add($"Logbook created: {Now.ToString("f")}")
+            logbook.Add("")
 
-                msg = "Combining the following two Epanet files:"
-                network("Title").Add(msg)
-                logbook.Add("----------------------------------------------")
-                logbook.Add(msg)
+            msg = "Combining the following two Epanet files:"
+            network("Title").Add(msg)
+            logbook.Add("----------------------------------------------")
+            logbook.Add(msg)
 
-                msg = $"File 1: {Path.GetFileName(filename)}"
-                network("Title").Add(msg)
-                logbook.Add(msg)
-            Else
-                msg = $"File 2: {Path.GetFileName(filename)}"
-                network("Title").Add(msg)
-                logbook.Add(msg)
-                logbook.Add("----------------------------------------------")
-            End If
+            msg = $"File 1: {Path.GetFileName(filename)}"
+            network("Title").Add(msg)
+            logbook.Add(msg)
+        Else
+            msg = $"File 2: {Path.GetFileName(filename)}"
+            network("Title").Add(msg)
+            logbook.Add(msg)
+            logbook.Add("----------------------------------------------")
         End If
     End Sub
 
-    Private Sub SaveLogbook(filename As String)
-        If LogType <> LogTypes.NoLogging Then
-            Dim logfilename = IO.Path.GetDirectoryName(filename) + "\logresults.txt"
+    Private Sub AddToLogbook(title As String, Optional exceptionMessage As String = Nothing)
+        logbook.Add(title)
+        If exceptionMessage IsNot Nothing Then logbook.Add(exceptionMessage)
+        _EventsLogged = True
+    End Sub
 
+    Private Sub SaveLogbook()
+        If LogType <> LogTypes.NoLogging And LogFilename <> "" Then
             'Delete old file, if it exists
-            File.Delete(logfilename)
+            File.Delete(LogFilename)
 
             'Write logresults to file
-            File.AppendAllLines(logfilename, logbook)
+            File.AppendAllLines(LogFilename, logbook)
         End If
     End Sub
 
@@ -195,7 +206,7 @@ Public Class EpanetManager
             If processedItems(section).Contains(item) Then
                 If LogType = LogTypes.FullLogging Then
                     Dim msg = $"Duplicate item In section '{section}': {item}"
-                    If Not logbook.Contains(msg) Then AddEvent(msg)
+                    If Not logbook.Contains(msg) Then AddToLogbook(msg)
                     Return True
                 End If
             End If
@@ -255,16 +266,12 @@ Public Class EpanetManager
         Next
     End Sub
 
-    Private Sub AddEvent(title As String)
-        logbook.Add(title)
-        _EventsLogged = True
-    End Sub
-
-    Private Sub AddFatalError(title As String, exceptionMessage As String)
-        'logbook.Add("----------------------------------------------")
-        logbook.Add("*** FATAL ERROR ***")
-        logbook.Add(title)
-        logbook.Add(exceptionMessage)
-        _EventsLogged = True
-    End Sub
+    Private Function IsEpanetFile(filename As String) As Boolean
+        If Path.GetExtension(filename).ToLower <> ".inp" Then
+            Console.WriteLine($"Invalid filetype: {Path.GetFileName(filename)}. EPAMERGE can only process .INP files.")
+            Return False
+        Else
+            Return True
+        End If
+    End Function
 End Class
