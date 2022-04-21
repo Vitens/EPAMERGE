@@ -28,10 +28,18 @@ Public Class EpanetManager
         InitSectionsList()
     End Sub
 
+    ''' <summary>
+    ''' Adds all information the source Epanet file to a list of sections.
+    ''' If a node or link already exists, then this information is skipped. Also
+    ''' these elements are notes in the logbook - if the log option is enabled.
+    ''' </summary>
+    ''' <param name="filename">Name of the source Epanet file</param>
+    ''' <returns>An exit code: 0 means success, > 0 means an error occurred.</returns>
     Public Function Load(ByVal filename As String) As Integer
         Try
             If Not IsEpanetFile(filename) Then Return ERROR_FAILURE
 
+            'Write the source and target files in the logbook
             SetLogbookHeader(filename)
 
             'Process the file and all sections in the Epanet INP file
@@ -50,6 +58,11 @@ Public Class EpanetManager
         End Try
     End Function
 
+    ''' <summary>
+    ''' Save all information from the source files to the target file
+    ''' </summary>
+    ''' <param name="filename">Name of the target Epanet file.</param>
+    ''' <returns>An exit code: 0 means success, > 0 means an error occurred.</returns>
     Public Function Save(ByVal filename As String) As Integer
         Try
             'Delete old file, if it exists
