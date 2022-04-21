@@ -5,8 +5,9 @@
     <RootNamespace>EpanetMerger</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
-    <Copyright>Trietsch 2022</Copyright>
+    <Copyright>Vitens 2022</Copyright>
     <Description>Epanet File Merger</Description>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
 </Project>
