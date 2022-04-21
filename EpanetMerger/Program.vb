@@ -118,7 +118,7 @@ EPAMERGE [drive:][path][source1 filename] [drive:][path][source2 filename] [driv
     Private Sub ShowErrorMessage(process As String, filename As String)
         Console.WriteLine($"Error: couldn't {process} file '{filename}'.")
         If epamanager.LogType <> LogTypes.NoLogging Then
-            Console.WriteLine("See the logfile 'logresults.txt' for details.")
+            Console.WriteLine("See the logfile '{logFilename}' for details.")
         End If
     End Sub
 
