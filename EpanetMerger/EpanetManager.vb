@@ -66,31 +66,34 @@ Public Class EpanetManager
             Return ERROR_SUCCESS
 
         Catch ex As DirectoryNotFoundException
-            ProcessError($"Path of the specified file '{filename}' could not be found!", ex)
+            ProcessError($"Path of the specified file '{filename}' could not be found!", ex, True)
             Return ERROR_PATH_NOT_FOUND
 
         Catch ex As PathTooLongException
-            ProcessError($"Path of the specified file '{filename}' is to long!", ex)
+            ProcessError($"Path of the specified file '{filename}' is to long!", ex, True)
             Return ERROR_BAD_PATHNAME
 
         Catch ex As AccessViolationException
-            ProcessError($"Couldn't access the path or file specified: '{filename}'!", ex)
+            ProcessError($"Couldn't access the path or file specified: '{filename}'!", ex, True)
             Return ERROR_ACCESS_DENIED
 
         Catch ex As Exception
-            ProcessError($"Saving file '{filename}' failed!", ex)
+            ProcessError($"Saving file '{filename}' failed!", ex, True)
             Return ERROR_FAILURE
 
         End Try
     End Function
 
-    Private Sub ProcessError(title As String, ex As Exception)
-        WriteErrorMessageToConsole(title, ex)
-        WriteErrorMessageToLogbook(title, ex)
+    Private Sub ProcessError(title As String, ex As Exception, Optional fatalError As Boolean = True)
+        'WriteErrorMessageToConsole(title, ex)
+
+        If Not fatalError Then
+            WriteErrorMessageToLogbook(title, ex)
+        End If
     End Sub
 
     Private Sub WriteErrorMessageToConsole(title As String, ex As Exception)
-        Console.WriteLine($"*** {title}  {ex.Message} ***")
+        'Console.WriteLine($"*** {title}  {ex.Message} ***")
     End Sub
 
     Private Sub WriteErrorMessageToLogbook(filename As String, ex As Exception)

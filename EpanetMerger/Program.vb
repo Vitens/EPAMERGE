@@ -100,7 +100,7 @@ EPAMERGE [drive:][path][source1 filename] [drive:][path][source2 filename] [driv
         For idx = 0 To 1
             result = epamanager.Load(filenames(idx))
             If result > 0 Then
-                ShowErrorMessage("load", filenames(idx))
+                ShowErrorMessage(filenames(idx), result)
                 Environment.Exit(result)
             End If
         Next
@@ -108,18 +108,28 @@ EPAMERGE [drive:][path][source1 filename] [drive:][path][source2 filename] [driv
         'Write target file to disk
         result = epamanager.Save(filenames(2))
         If result > 0 Then
-            ShowErrorMessage("save", filenames(2))
+            ShowErrorMessage(filenames(2), result)
             Environment.Exit(result)
         Else
             ShowFinishedMessage()
         End If
     End Sub
 
-    Private Sub ShowErrorMessage(process As String, filename As String)
-        Console.WriteLine($"Error: couldn't {process} file '{filename}'.")
-        If epamanager.LogType <> LogTypes.NoLogging Then
-            Console.WriteLine("See the logfile '{logFilename}' for details.")
-        End If
+    Private Sub ShowErrorMessage(filename As String, Optional errCode As Integer = 1)
+        Select Case errCode
+            Case ERROR_FILE_NOT_FOUND
+                Console.WriteLine($"Error: couldn't find file '{filename}'.")
+            Case ERROR_PATH_NOT_FOUND
+                Console.WriteLine($"Error: couldn't access or find the path of file '{filename}'.")
+            Case ERROR_ACCESS_DENIED
+                Console.WriteLine($"Error: couldn't access file '{filename}'.")
+            Case ERROR_BAD_ARGUMENTS
+                Console.WriteLine($"Error: bad arguments specified.")
+            Case ERROR_BAD_PATHNAME
+                Console.WriteLine($"Error: pathname is too long or invalid for file '{filename}'.")
+            Case Else
+                Console.WriteLine($"Error: couldn't process file '{filename}'.")
+        End Select
     End Sub
 
     Private Sub ShowFinishedMessage()
