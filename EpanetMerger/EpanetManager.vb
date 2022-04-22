@@ -191,7 +191,7 @@ Public Class EpanetManager
         If filesProcessed = 1 And line.StartsWith(";") Then Exit Sub
 
         Select Case section
-            Case "Title", "End"
+            Case "Title", "Backdrop", "End"
                 'Don't process these sections
                 Exit Sub
 
