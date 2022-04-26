@@ -15,6 +15,7 @@ EPAMERGE [drive:][path][source1 filename] [drive:][path][source2 filename] [driv
                 F  Full logging: detailed information on exceptions, e.g. on duplicate nodes and links.
 "
 
+    'See this site for error codes: https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
     Public Const ERROR_SUCCESS = 0
     Public Const ERROR_FAILURE = 1
     Public Const ERROR_FILE_NOT_FOUND = 2

@@ -48,12 +48,20 @@ Public Class EpanetManager
             filesProcessed += 1
             Return ERROR_SUCCESS
 
+        Catch ex As DirectoryNotFoundException
+            ProcessFatalError($"Path of the specified file '{filename}' could not be found!", ex)
+            Return ERROR_PATH_NOT_FOUND
+
         Catch ex As FileNotFoundException
-            ProcessError($"Couldn't find the specified file '{filename}'!", ex)
+            ProcessFatalError($"Couldn't find the specified file '{filename}'!", ex)
             Return ERROR_FILE_NOT_FOUND
 
+        Catch ex As AccessViolationException
+            ProcessFatalError($"Couldn't access the path or file specified: '{filename}'!", ex)
+            Return ERROR_ACCESS_DENIED
+
         Catch ex As Exception
-            ProcessError($"Processing file '{filename}' failed!", ex)
+            ProcessFatalError($"Loading file '{filename}' failed!", ex)
             Return ERROR_FAILURE
         End Try
     End Function
@@ -79,41 +87,23 @@ Public Class EpanetManager
             Return ERROR_SUCCESS
 
         Catch ex As DirectoryNotFoundException
-            ProcessError($"Path of the specified file '{filename}' could not be found!", ex, True)
+            ProcessFatalError($"Path of the specified file '{filename}' could not be found!", ex)
             Return ERROR_PATH_NOT_FOUND
 
         Catch ex As PathTooLongException
-            ProcessError($"Path of the specified file '{filename}' is to long!", ex, True)
+            ProcessFatalError($"Path of the specified file '{filename}' is to long!", ex)
             Return ERROR_BAD_PATHNAME
 
         Catch ex As AccessViolationException
-            ProcessError($"Couldn't access the path or file specified: '{filename}'!", ex, True)
+            ProcessFatalError($"Couldn't access the path or file specified: '{filename}'!", ex)
             Return ERROR_ACCESS_DENIED
 
         Catch ex As Exception
-            ProcessError($"Saving file '{filename}' failed!", ex, True)
+            ProcessFatalError($"Saving file '{filename}' failed!", ex)
             Return ERROR_FAILURE
 
         End Try
     End Function
-
-    Private Sub ProcessError(title As String, ex As Exception, Optional fatalError As Boolean = True)
-        'WriteErrorMessageToConsole(title, ex)
-
-        If Not fatalError Then
-            WriteErrorMessageToLogbook(title, ex)
-        End If
-    End Sub
-
-    Private Sub WriteErrorMessageToConsole(title As String, ex As Exception)
-        'Console.WriteLine($"*** {title}  {ex.Message} ***")
-    End Sub
-
-    Private Sub WriteErrorMessageToLogbook(filename As String, ex As Exception)
-        AddToLogbook($"Saving the target file '{filename}' failed!", ex.Message)
-        'Save logbook
-        If LogType <> LogTypes.NoLogging Then SaveLogbook()
-    End Sub
 
     Private Sub SetLogbookHeader(filename)
         Dim msg As String = ""
@@ -138,9 +128,19 @@ Public Class EpanetManager
         End If
     End Sub
 
+    Private Sub ProcessFatalError(title As String, ex As Exception)
+        AddToLogbook(title, ex.Message)
+
+        'Save logbook
+        If LogType <> LogTypes.NoLogging Then SaveLogbook()
+    End Sub
+
     Private Sub AddToLogbook(title As String, Optional exceptionMessage As String = Nothing)
         logbook.Add(title)
-        If exceptionMessage IsNot Nothing Then logbook.Add(exceptionMessage)
+        If exceptionMessage IsNot Nothing Then
+            logbook.Add($"System error message: {exceptionMessage}")
+        End If
+
         _EventsLogged = True
     End Sub
 
