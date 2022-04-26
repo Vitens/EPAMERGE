@@ -1,5 +1,4 @@
-﻿Imports System.Globalization
-Imports System.Runtime.CompilerServices
+﻿Imports System.Runtime.CompilerServices
 
 Module StringExtensions
     <Extension()>

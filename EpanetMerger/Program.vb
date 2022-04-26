@@ -1,6 +1,3 @@
-Imports System
-Imports System.IO
-
 Module Program
     Private Const HelpString = "Merges two Epanet files into one. Returns whether or not the merge was successful.
 
