@@ -132,7 +132,7 @@ Public Class EpanetManager
         AddToLogbook(title, ex.Message)
 
         'Save logbook
-        If LogType <> LogTypes.NoLogging Then SaveLogbook()
+        SaveLogbook()
     End Sub
 
     Private Sub AddToLogbook(title As String, Optional exceptionMessage As String = Nothing)
