@@ -195,7 +195,7 @@ Public Class EpanetManager
                 'Don't process these sections
                 Exit Sub
 
-            Case "Times", "Report", "Options", "Energy", "Reactions", "Backdrop"
+            Case "Times", "Report", "Options", "Energy", "Reactions"
                 'Only add these sections for the first file
                 If filesProcessed = 1 Then Exit Sub
 
