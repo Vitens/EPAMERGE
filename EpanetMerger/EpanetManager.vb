@@ -13,6 +13,7 @@ Public Class EpanetManager
     Private section As String
     Private sections As List(Of String)
     Private filesProcessed As Integer
+    Private measurepoints As HashSet(Of String)
     Private logbook As List(Of String)
 
     Public Property LogType As LogTypes = LogTypes.NoLogging
@@ -22,6 +23,7 @@ Public Class EpanetManager
     Public Sub New()
         network = New Dictionary(Of String, List(Of String))
         processedItems = New Dictionary(Of String, HashSet(Of String))
+        measurepoints = New HashSet(Of String)
         logbook = New List(Of String)
 
         sections = New List(Of String)
@@ -205,21 +207,32 @@ Public Class EpanetManager
             Case "Labels"
                 'Add the labels of both files
 
-            Case "Rules", "Controls"
+            Case "Rules", "Controls", "Pumps"
                 Throw New NotImplementedException("Logic for Rules and Controls is not yet (properly) implemented.")
 
             Case Else
                 'Add the items from both files as long as they are unique 
-                If ContainsDuplicateItem(line) Then Exit Sub
+                If SkipItem(line) Then Exit Sub
         End Select
         network(section).Add(line)
     End Sub
 
-    Private Function ContainsDuplicateItem(ByVal line As String) As Boolean
+    Private Function SkipItem(ByRef line As String) As Boolean
         Dim item = line.Trim.Split(" ")(0)
 
         If Not processedItems.ContainsKey(section) Then
             processedItems.Add(section, New HashSet(Of String))
+        End If
+
+        If section = "Pipes" Or section = "Junction" Then 'mogelijk een opgelegde flow of een opgelegde druk?
+            If filesProcessed = 0 And line.Contains("{PiPath:") Then 'flowmeter of drukmeter!
+                'Onthoudt deze flowmeter:
+                measurepoints.Add(item)
+            ElseIf filesProcessed = 1 And measurepoints.Contains(item) Then
+                'ToDo: Verwijder commentaar in network(section)!!!
+
+                Return True
+            End If
         End If
 
         If filesProcessed = 0 Then
