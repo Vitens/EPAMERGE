@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>EpanetMerger</RootNamespace>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <Copyright>Vitens 2022</Copyright>
     <Description>Epanet File Merger</Description>
