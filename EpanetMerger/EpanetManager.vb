@@ -191,7 +191,10 @@ Public Class EpanetManager
         If filesProcessed = 1 And line.StartsWith(";") Then Exit Sub
 
         Select Case section
-            Case "Title", "Backdrop", "End"
+            Case "Title"
+                'Merge JSON key-value pairs!
+
+            Case "Backdrop", "End"
                 'Don't process these sections
                 Exit Sub
 
@@ -199,8 +202,11 @@ Public Class EpanetManager
                 'Only add these sections for the first file
                 If filesProcessed = 1 Then Exit Sub
 
-            Case "Labels", "Rules", "Controls"
+            Case "Labels"
                 'Add the labels of both files
+
+            Case "Rules", "Controls"
+                Throw New NotImplementedException("Logic for Rules and Controls is not yet (properly) implemented.")
 
             Case Else
                 'Add the items from both files as long as they are unique 
